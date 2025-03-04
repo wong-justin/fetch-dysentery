@@ -211,8 +211,13 @@ main() {
   disk_space_remaining=$(get_disk_space_remaining)
   num_packages=$(get_num_packages)
 
+  local disease
+  local afflictions=("dysentery" "dysentery" "dysentery" "measles" "cholera" "typhoid")
+  local random_index=$((RANDOM % 6))
+  disease="${afflictions[$random_index]}"
+
   # Draw a box around the message
-  local box_output=$(draw_box "$user_host has dysentery.")
+  local box_output=$(draw_box "$user_host has $disease.")
 
   # Split box_output into one variable per line
   readarray -t box_array <<< "$box_output"
