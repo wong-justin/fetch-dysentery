@@ -297,8 +297,8 @@ main() {
   fi
 
   local disease
-  local afflictions=("dysentery" "dysentery" "dysentery" "measles" "cholera" "typhoid")
-  local random_index=$((RANDOM % 6))
+  local afflictions=("dysentery" "dysentery" "dysentery" "dysentery" "dysentery" "measles" "cholera" "typhoid")
+  local random_index=$((RANDOM % 8))
   disease="${afflictions[$random_index]}"
 
   # Draw a box around the message
