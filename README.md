@@ -1,6 +1,6 @@
 # fetch-dysentery
 
-Neofetch crossed with the Oregon Trail
+Neofetch meets with the Oregon Trail
 
 ![dysentery2(1)](https://github.com/user-attachments/assets/bbaa18a4-7cab-4e87-bcf1-9ec83e29c29f)
 
