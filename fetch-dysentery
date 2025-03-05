@@ -167,11 +167,12 @@ get_battery_level() {
   local battery="100%"
   case $os in
       "Linux")
-          for bat in "/sys/class/power_supply/"{BAT,axp288_fuel_gauge,CMB}*; do
+          for bat in "/sys/class/power_supply/"{BAT,axp288_fuel_gauge,CMB,battery}*; do
               capacity="$(< "${bat}/capacity")"
 
               if [[ "$capacity" ]]; then
-                  battery="${capacity}%"
+                  battery="${capacity}%";
+		  break
       	      fi
           done
       ;;
