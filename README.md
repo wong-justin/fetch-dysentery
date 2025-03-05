@@ -33,3 +33,4 @@ FIXME:
 - improve `get_battery`?
 - mac does not have `/proc/cpuinfo`
 - neither does it have `/proc/meminfo`
+- use shellcheck
