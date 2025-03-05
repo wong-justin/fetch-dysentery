@@ -96,6 +96,7 @@ get_date() {
 
 get_user_host() {
   local user=$(whoami)
+  # HOSTNAME is a bash variable, but not POSIX, so try hostname command as backup i guess
   local host=${HOSTNAME:-$(hostname)}
   echo "$user@$host"
 }
