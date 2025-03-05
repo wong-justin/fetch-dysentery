@@ -46,7 +46,39 @@ ascii_art="\
     [38;2;8;8;8m▔[7m[38;2;11;8;6m▁[0m[38;2;189;174;165;48;2;14;8;4m▝[38;2;254;254;254;48;2;92;80;72m▔[0m[7m[38;2;1;1;1m▁[0m    [7m[38;2;0;0;0m▁[0m[38;2;50;37;27m▀[38;2;199;187;180m▔[38;2;19;17;15m▔[0m                       [0m
 [?25h"
 
-# System Information Functions (POSIX compatible)
+# copied from neotech
+get_os() {
+    # $kernel_name is set in a function called cache_uname and is
+    # just the output of "uname -s".
+    case $kernel_name in
+        Darwin)   os=$darwin_name ;;
+        SunOS)    os=Solaris ;;
+        Haiku)    os=Haiku ;;
+        MINIX)    os=MINIX ;;
+        AIX)      os=AIX ;;
+        IRIX*)    os=IRIX ;;
+        FreeMiNT) os=FreeMiNT ;;
+
+        Linux|GNU*)
+            os=Linux
+        ;;
+
+        *BSD|DragonFly|Bitrig)
+            os=BSD
+        ;;
+
+        CYGWIN*|MSYS*|MINGW*)
+            os=Windows
+        ;;
+
+        *)
+            printf '%s\n' "Unknown OS detected: '$kernel_name', aborting..." >&2
+            printf '%s\n' "Open an issue on GitHub to add support for your OS." >&2
+            exit 1
+        ;;
+    esac
+}
+
 get_date() {
   date "+%B %-d, %Y"
 }
@@ -149,32 +181,65 @@ get_num_cpu_cores() {
   fi
 }
 
+# copied and modified from neofetch
+# only tested on linux
 get_battery_level() {
-  if [[ -f /sys/class/power_supply/BAT0/capacity ]]; then
-    # Linux (most systems)
-    cat /sys/class/power_supply/BAT0/capacity
-  elif [[ -f /sys/class/power_supply/BAT1/capacity ]]; then
-    # Linux (some systems with multiple batteries)
-    cat /sys/class/power_supply/BAT1/capacity
-  elif [[ -d /sys/class/power_supply/battery ]]; then
-    # Linux (some systems with a 'battery' directory)
-    if [[ -f /sys/class/power_supply/battery/capacity ]]; then
-      cat /sys/class/power_supply/battery/capacity
-    else
-      echo "100" # No capacity file, assume full
-    fi
-  elif command -v ioreg &> /dev/null; then
-    # macOS
-    ioreg -c AppleSmartBattery | awk '/"CurrentCapacity" = / { gsub(/[^0-9]/, "", $3); print $3 }'
-  elif command -v acpi &> /dev/null; then
-    # Some Unix-like systems
-    acpi -b | awk '{print $3}' | sed 's/,//' | sed 's/%//'
-  elif command -v upower &> /dev/null; then
-    # Linux (using upower)
-    upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep percentage | awk '{print $2}' | sed 's/%//'
-  else
-    echo "100" # Assume full if no battery info found
-  fi
+  local battery="100%"
+  case $os in
+      "Linux")
+          for bat in "/sys/class/power_supply/"{BAT,axp288_fuel_gauge,CMB}*; do
+              capacity="$(< "${bat}/capacity")"
+
+              if [[ "$capacity" ]]; then
+                  battery="${capacity}%"
+      	      fi
+          done
+      ;;
+
+      "BSD")
+          case $kernel_name in
+              "FreeBSD"* | "DragonFly"*)
+                  battery="$(acpiconf -i 0 | awk -F ':\t' '/Remaining capacity/ {print $2}')"
+              ;;
+
+              "NetBSD"*)
+                  battery="$(envstat | awk '\\(|\\)' '/charge:/ {print $2}')"
+                  battery="${battery/\.*/%}"
+              ;;
+
+              "OpenBSD"* | "Bitrig"*)
+                  battery0full="$(sysctl -n   hw.sensors.acpibat0.watthour0\
+                                              hw.sensors.acpibat0.amphour0)"
+                  battery0full="${battery0full%% *}"
+
+                  battery0now="$(sysctl -n    hw.sensors.acpibat0.watthour3\
+                                              hw.sensors.acpibat0.amphour3)"
+                  battery0now="${battery0now%% *}"
+
+                  [[ "$battery0full" ]] && \
+                  battery="$((100 * ${battery0now/\.} / ${battery0full/\.}))%"
+              ;;
+          esac
+      ;;
+
+      "Mac OS X"|"macOS")
+          battery="$(pmset -g batt | grep -o '[0-9]*%')"
+      ;;
+
+      "Windows")
+          battery="$(wmic Path Win32_Battery get EstimatedChargeRemaining)"
+          battery="${battery/EstimatedChargeRemaining}"
+          battery="$(trim "$battery")%"
+      ;;
+
+      "Haiku")
+          battery0full="$(awk -F '[^0-9]*' 'NR==2 {print $4}' /dev/power/acpi_battery/0)"
+          battery0now="$(awk -F '[^0-9]*' 'NR==5 {print $4}' /dev/power/acpi_battery/0)"
+          battery="$((battery0full * 100 / battery0now))%"
+      ;;
+  esac
+
+  echo "$battery"
 }
 
 get_weather() {
@@ -330,7 +395,7 @@ main() {
     ""
     "          Date:  $today"
     "       Weather:  $weather"
-    "        Health:  $battery%"
+    "        Health:  $battery"
     "     Resources:  $num_packages packages"
     "                 $memory RAM"
     "                 $num_cores cores"
