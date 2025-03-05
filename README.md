@@ -9,3 +9,21 @@ If you trust me:
 ```
 curl -Ls https://raw.githubusercontent.com/wong-justin/fetch-dysentery/refs/heads/main/fetch-dysentery | bash
 ```
+
+You can override the messages by using these options:
+
+```
+--user-at-host
+--date
+--weather
+--battery
+--packages
+--ram
+--cores
+--disk-space-used
+--disk-space-remaining
+```
+
+Example: `curl -Ls https://raw.githubusercontent.com/wong-justin/fetch-dysentery/refs/heads/main/fetch-dysentery | bash -s -- --date "$(date +%Y-%m-%d)"`
+
+This is especially useful if one of the specs fails to display on your machine.
