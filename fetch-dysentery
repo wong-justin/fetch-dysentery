@@ -85,7 +85,7 @@ get_date() {
 
 get_user_host() {
   local user=$(whoami)
-  local host=$(cat /etc/hostname)
+  local host=${HOSTNAME:-$(hostname)}
   echo "$user@$host"
 }
 
