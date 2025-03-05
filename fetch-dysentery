@@ -121,15 +121,17 @@ get_disk_space_remaining() {
 
 get_packages() {
   # Determine the package manager and get the package count
+
   if command -v dpkg &> /dev/null; then
     # Debian-based (e.g., Ubuntu, Debian)
     num_packages=$(dpkg -l | grep '^ii' | wc -l)
-  elif command -v rpm &> /dev/null; then
-    # Red Hat-based (e.g., Fedora, CentOS)
-    num_packages=$(rpm -qa | wc -l)
+  # pacman should come first before other package managers like rpm
   elif command -v pacman &> /dev/null; then
     # Arch-based (e.g., Arch Linux, Manjaro)
     num_packages=$(pacman -Qq | wc -l)
+  elif command -v rpm &> /dev/null; then
+    # Red Hat-based (e.g., Fedora, CentOS)
+    num_packages=$(rpm -qa | wc -l)
   elif command -v apk &> /dev/null; then
     # Alpine Linux
     num_packages=$(apk info | wc -l)
@@ -141,7 +143,8 @@ get_packages() {
     return 1 # Indicate an error
   fi
 
-  echo "${num_packages} packages"
+  # some people reported leading whitespace somehow, so strip that
+  echo "${num_packages} packages" | sed 's/^\s*//'
 }
 
 get_cpu_cores() {
