@@ -180,9 +180,16 @@ get_battery_level() {
 get_weather() {
   # todo: maybe use computer temp instead of literal weather
   # also i think if using VPN, the location for wttr.in will be wrong 
-  curl -s wttr.in/?format='%f,+%C' | sed 's/^\+//' | sed 's/, [A-Z]/\L&/'
-  # curl -s wttr.in/?format='%f,+%C+%c' | sed 's/^\+//' | sed 's/, [A-Z]/\L&/'
-  # curl -s wttr.in/?format='%f,+%C+%c' | tr '[:upper:]' '[:lower:]'
+  
+  # - strip leading plus sign
+  # - lowercase first letter after comma
+  curl -s wttr.in/?format='%f,+%C' | perl -pe 's/^\+?(.*), ([A-Z])/$1.", " . lc($2)/ge'
+  #
+  # curl -s wttr.in/?format='%f,+%C' | sed 's/^\+//' | sed 's/, [A-Z]/\L&/' 
+  #   broken on mac; produces eg. 50°FL, Light rain. 
+  #   because \L is only on GNU sed and not mac sed
+  #
+  # other decent formats: '%f,+%C+%c'
 }
 
 get_first_line_width() {
