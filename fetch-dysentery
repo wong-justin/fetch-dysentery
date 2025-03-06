@@ -122,11 +122,11 @@ get_memory() {
 }
 
 get_disk_space_used() {
-	df -h / | awk 'NR==2 {print $3}' | sed -E 's/([0-9]+)/\1 /'
+	df -h / | awk 'NR==2 {print $3}' | sed -E 's/([0-9\.]+)/\1 /'
 }
 
 get_disk_space_remaining() {
-	df -h / | awk 'NR==2 {print $4}' | sed -E 's/([0-9]+)/\1 /'
+	df -h / | awk 'NR==2 {print $4}' | sed -E 's/([0-9\.]+)/\1 /'
 }
 
 get_packages() {
