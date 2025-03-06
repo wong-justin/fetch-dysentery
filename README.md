@@ -24,13 +24,6 @@ You can override a line by using one of these options:
 --disk-space-remaining
 ```
 
-Example: `curl -Ls https://raw.githubusercontent.com/wong-justin/fetch-dysentery/refs/heads/main/fetch-dysentery | bash -s -- --date "$(date +%Y-%m-%d)"`
-
 This is useful if one of the specs fails to display on your machine.
 
-FIXME:
-
-- improve `get_battery`?
-- mac does not have `/proc/cpuinfo`
-- neither does it have `/proc/meminfo`
-- use shellcheck
+Example: `curl -Ls https://raw.githubusercontent.com/wong-justin/fetch-dysentery/refs/heads/main/fetch-dysentery | bash -s -- --date "$(date +%Y-%m-%d)"`
