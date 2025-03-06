@@ -359,7 +359,7 @@ main() {
   local disk_space_remaining="${disk_space_remaining:=$(get_disk_space_remaining)}"
 
   local disease
-  local afflictions=("dysentery" "dysentery" "dysentery" "dysentery" "dysentery" "measles" "cholera" "typhoid")
+  local afflictions=("dysentery" "dysentery" "dysentery" "dysentery" "dysentery" "measles" "cholera" "typhoid") # a snakebite, a broken arm
   local random_index=$((RANDOM % 8))
   disease="${afflictions[$random_index]}"
 
@@ -401,6 +401,7 @@ EOF
     " Next landmark:  $disk_space_remaining"
   )
   # os, cpu
+  # pace, rations
 
   max_lines=$((ascii_lines > ${#info_lines[@]} ? ascii_lines : ${#info_lines[@]}))
 
